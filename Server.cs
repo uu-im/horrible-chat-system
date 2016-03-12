@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 
-public class HelloWorld
+public class Server
 {
   static public void Main ()
   {

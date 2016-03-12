@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 
-public class HelloWorld
+public class Client
 {
   static public void Main ()
   {
