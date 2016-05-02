@@ -27,11 +27,11 @@ public class Server
     TcpListener server = new TcpListener(ip, port);
     try {
       server.Start();
-      Console.WriteLine($"[Server]: Started at port {port}");
+      Console.WriteLine(String.Format("[Server]: Started at port {0}", port));
     }
     catch (SocketException exception) {
       string error = exception.Message;
-      Console.WriteLine($"Could not start server: {error}");
+      Console.WriteLine(String.Format("Could not start server: {0}", error));
       return;
     }
 
@@ -64,11 +64,11 @@ public class Server
             byte[] buffer = new byte[client.ReceiveBufferSize];
             int data = stream.Read(buffer, 0, client.ReceiveBufferSize);
             username = Encoding.Unicode.GetString(buffer, 0, data);
-            Console.WriteLine($"[Handshake]: Requesting username '{username}' ");
+            Console.WriteLine(String.Format("[Handshake]: Requesting username '{0}' ", username));
           }
           catch (IOException exception) {
             string error = exception.Message;
-            Console.WriteLine($"[Handshake]: Did not receive username from new conncetion ({error})");
+            Console.WriteLine(String.Format("[Handshake]: Did not receive username from new conncetion ({0})", error));
             break;
           }
 
@@ -86,17 +86,17 @@ public class Server
           }
 
           if (isOk) {
-            Console.WriteLine($"[Handshake]: Granting username '{username}' ");
+            Console.WriteLine(String.Format("[Handshake]: Granting username '{0}' ", username));
             clients.Add(username, client);
 
             // Print all current users
             Console.WriteLine("===MEMBERS===");
             foreach(var c in clients) {
-              Console.WriteLine($"{c.Key}");
+              Console.WriteLine(c.Key);
             }
             Console.WriteLine("=============");
           } else {
-            Console.WriteLine($"[Handshake]: Rejecting username '{username}' ");
+            Console.WriteLine(String.Format("[Handshake]: Rejecting username '{0}' ", username));
           }
 
           // Send username response
@@ -106,7 +106,7 @@ public class Server
             stream.Write(message, 0, message.Length);
           } catch (IOException exception) {
             string error = exception.Message;
-            Console.WriteLine($"[Handshake]: Could not send message back to client that requested {username} ({error})");
+            Console.WriteLine(String.Format("[Handshake]: Could not send message back to client that requested {0} ({1})", username, error));
             break;
           }
 
@@ -117,14 +117,14 @@ public class Server
       // Remove disconnected clients
       bool hadStaleClients = clients.Any(c => !c.Value.Connected);
       foreach(var client in clients.Where(c => !c.Value.Connected).ToList()) {
-        Console.WriteLine($"[Remove]: [{client.Key}]");
+        Console.WriteLine(String.Format("[Remove]: [{0}]", client.Key));
       }
       clients = clients.Where(c => c.Value.Connected)
         .ToDictionary(c => c.Key, c => c.Value);
       if (hadStaleClients) {
         Console.WriteLine("===MEMBERS===");
         foreach(var c in clients) {
-          Console.WriteLine($"{c.Key}");
+          Console.WriteLine(c.Key);
         }
         Console.WriteLine("=============");
       }
@@ -148,26 +148,26 @@ public class Server
           }
           catch (SocketException exception) {
             string error = exception.Message;
-            Console.WriteLine($"[ERROR]: Could not read message from [{senderName}]");
+            Console.WriteLine(String.Format("[ERROR]: Could not read message from [{0}]", senderName));
             continue;
           }
 
           // Display message
-          Console.WriteLine($"[Broadcast]: {text}");
+          Console.WriteLine(String.Format("[Broadcast]: {0}", text));
 
           // Broadcast to all other clients
           foreach(var receiver in clients) {
             string receiverName = receiver.Key;
             if (receiverName != senderName) {
               TcpClient receiverClient = receiver.Value;
-              Console.WriteLine($"[Send] from [{senderName}] to [{receiverName}]");
+              Console.WriteLine(String.Format("[Send] from [{0}] to [{1}]", senderName, receiverName));
               try {
                 NetworkStream receiverStream = receiverClient.GetStream();
                 byte[] message = Encoding.Unicode.GetBytes(text);
                 receiverStream.Write(message, 0, message.Length);
               } catch (IOException exception) {
                 string error = exception.Message;
-                Console.WriteLine($"[ERROR]: Broadcast from [{senderName}] to [{receiverName}] failed.");
+                Console.WriteLine(String.Format("[ERROR]: Broadcast from [{0}] to [{1}] failed.", senderName, receiverName));
               }
             }
           }

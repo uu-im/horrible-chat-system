@@ -17,14 +17,14 @@ public class Client
 
 
     // Connect to server
-    Console.WriteLine($"Attempting to connect to port {port}...");
+    Console.WriteLine(String.Format("Attempting to connect to port {0}...", port));
     TcpClient client;
     try {
       client = new TcpClient("127.0.0.1", port);
     }
     catch (SocketException exception) {
       string error = exception.Message;
-      Console.WriteLine($"Could not connect to server at {port} ({error})");
+      Console.WriteLine(String.Format("Could not connect to server at {0} ({1})", port, error));
       return;
     }
 
@@ -51,7 +51,7 @@ public class Client
       }
       catch (SocketException exception) {
         string error = exception.Message;
-        Console.WriteLine($"Could not send username to server ({error})");
+        Console.WriteLine(String.Format("Could not send username to server ({0})", error));
         return;
       }
 
@@ -99,8 +99,8 @@ public class Client
         // Print chat history
         Console.WriteLine("====================================");
         foreach(var entry in history) {
-          string paddedSender = ($"{entry.Key} ").PadRight(13, ' ');
-          Console.WriteLine($"{paddedSender}{entry.Value}");
+          string paddedSender = (String.Format("{0} ", entry.Key)).PadRight(13, ' ');
+          Console.WriteLine(String.Format("{0}{1}", paddedSender, entry.Value));
         }
       }
 
@@ -122,14 +122,14 @@ public class Client
             // Send message
           case ConsoleKey.Enter:
             history.Insert(0, new KeyValuePair<string, string>("You", text));
-            string message = $"{username}:{text}";
+            string message = String.Format("{0}:{1}", username, text);
             byte[] payload = Encoding.Unicode.GetBytes(message);
             try {
               stream.Write(payload, 0, payload.Length);
             }
             catch (SocketException exception) {
               string error = exception.Message;
-              Console.WriteLine($"Could not send message to server ({error})");
+              Console.WriteLine(String.Format("Could not send message to server ({0})", error));
               return;
             }
             text = String.Empty;
